@@ -4,9 +4,15 @@ defmodule Rocketpay.Accounts.Operation do
   alias Rocketpay.Account
 
   def call(%{"id" => id, "value" => value}, operation) do
+    operation_name = account_operation_name(operation)
+    retrieve_name = "#{operation_name}_get" |> String.to_atom
     Multi.new()
-    |> Multi.run(:account, fn repo, _changes -> get_account(repo, id) end )
-    |> Multi.run(:update_balance, fn repo, %{account: account} -> update_balance(repo, account, value, operation) end )
+    |> Multi.run(retrieve_name, fn repo, _changes -> get_account(repo, id) end )
+    |> Multi.run(operation_name, fn repo, changes ->
+      account = Map.get(changes, retrieve_name)
+
+      update_balance(repo, account, value, operation)
+    end )
   end
 
   defp get_account(repo, id) do
@@ -39,4 +45,6 @@ defmodule Rocketpay.Accounts.Operation do
     |> Account.changeset(%{balance: value})
     |> repo.update
   end
+
+  defp account_operation_name(operation), do: "account_#{Atom.to_string(operation)}" |> String.to_atom
 end
