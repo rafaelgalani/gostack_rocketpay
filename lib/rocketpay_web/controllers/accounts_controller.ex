@@ -21,4 +21,12 @@ defmodule RocketpayWeb.AccountsController do
     end
   end
 
+  def transaction(conn, params) do
+    with {:ok, %{to_account: to_account, from_account: from_account} } <- Rocketpay.transaction(params) do
+      conn
+      |> put_status(:ok)
+      |> render("transaction.json", %{to_account: to_account, from_account: from_account})
+    end
+  end
+
 end
