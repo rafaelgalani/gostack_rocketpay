@@ -18,6 +18,10 @@ config :rocketpay, RocketpayWeb.Endpoint,
   pubsub_server: Rocketpay.PubSub,
   live_view: [signing_salt: "cbnzjPT1"]
 
+config :rocketpay, :basic_auth,
+  username: "rafael",
+  password: "password"
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
